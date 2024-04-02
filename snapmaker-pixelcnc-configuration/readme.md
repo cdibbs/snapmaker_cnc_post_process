@@ -1,6 +1,7 @@
 ![Logo](https://deftware.org/cdn/shop/products/logo_sq_nb_360x.png)
 
-This is SnapMaker's post-processing configuration file for the Deftware PixelCNC software. Motto: "By artists, for artists."
+This is SnapMaker's post-processing configuration file for the Deftware PixelCNC software. Their motto: "By artists, for artists." It supports "rest machining" for doing roughing and finishing passes.
+
 Includes postprocessing configuration for the 50- and 200-watt modules.
 
 **The official website is**
