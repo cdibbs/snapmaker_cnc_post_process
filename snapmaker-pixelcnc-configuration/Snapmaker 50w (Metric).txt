@@ -1,0 +1,223 @@
+///////////////////////////////////
+// PixelCNC Post: Easel (Metric) //
+///////////////////////////////////
+
+// WARNING: CHANGES TO THIS FILE WILL
+// BE OVERWRITTEN BY AUTOMATIC UPDATES.
+// MAKE MODIFICATIONS TO A COPY INSTEAD.
+
+// Last Modified: 10:26 PM 9/28/2023
+
+Version				1.1		// PixelCNC post processor format version
+
+FileExtension			"cnc"		// file extension on g-code files
+ReadStart			""		// no starting or ending chars
+ReadStop			""		//
+
+
+
+/////////////
+// Options //
+/////////////
+
+UseRelativeCoord		0		// relative move coordinates instead of absolute
+UseToolChange			0		// include tool change commands
+UseSpindle			1		// include spindle start/stop/speed commands
+UseCoolant			0		// include coolant commands
+
+
+
+//////////////
+// Comments //
+//////////////
+
+UseComments			1		// whether or not comments output is allowed
+CommentBegin			"("
+CommentEnd			")"
+
+
+
+////////////////
+// Sequencing //
+////////////////
+
+UseSequenceNums			0		// prefix blocks with sequence numbers ?
+SequenceComments		1		// prefix sequence on comments?
+SequencePrefix			"N"		// block sequence prefix character/string
+SequenceDigits			3		// non-zero if leading-zeroes needed
+SequenceStart			1		// starting sequence
+SequenceInc			1		// sequence increment
+
+
+
+////////////////
+// Formatting //
+////////////////
+
+// General formatting
+Delimiter			" "		// separate parameter with a space
+EndOfBlock			"\n"		// separate command blocks with newline
+UsePlusSign			0		// don't need a + on positive values
+TwoDigitTool			0		// leading-zero on single-digit tool index
+Units				1		// 0=inches/1=metric, converts move coords and feedrates from project units
+
+// Modal capabilities
+ModalMotion			0		// don't need G0/G1/G2/G3 on each line
+ModalCoord			1		// XYZ included only as needed
+ModalCenter			0		// IJKR included only as needed
+ModalSpeed			0		// set spindle speed on each spindle stop/start ?
+ModalFeed			0		// set-and forget feed rate ?
+
+// Speeds
+SpeedScale			1.0		// spindle RPM scaling factor
+SpeedMin			1000		// minimum spindle speed value after SpeedScale * RPM
+SpeedMax			12000		// maximum spindle speed value after SpeedScale * RPM
+SpeedDecimals			0
+SpeedTrailingZeroes		0		// ignored if Decimals == 0
+
+// Feeds
+FeedScale			1.0		// feedrate scaling factor
+FeedMin				1.0		// minimum feed rate value output after FeedScale * IPM
+FeedMax				1000.0		// maximum feed rate value output after FeedScale * IPM
+FeedDecimals			1
+FeedTrailingZeroes		1		// ignored if Decimals == 0
+
+// Motion coordinates formatting
+MotionScaleX			1.0		// affects circular arc IJK parms as well
+MotionScaleY			1.0
+MotionScaleZ			1.0
+MotionDecimals			5		// number of decimal places of accuracy
+MotionTrailZeroes		1		// whether or not to use trailing zeroes
+
+// Arc/circular motion
+ArcFormat			0		// 0=IJK 1=IJKR 2=R
+ArcCenterFormat			1		// IJK formats only: 0=Absolute 1=StartToCenter 2=CenterToStart
+ArcPlaneYZ			1		// Z-axis supported
+ArcPlaneXZ			1		// Y-axis supported
+ArcPlaneXY			1		// X-axis supported
+ArcSignedRadius			0		// use negative radius for CW
+ArcMaxAngle			180		// 2D arc angle limit (0=unlimited)
+
+
+
+///////////////////
+// Command Codes //
+///////////////////
+
+// Motions
+CodeRapid			"G0"
+CodeLinear			"G1"
+CodeArcCW			"G2"
+CodeArcCCW			"G3"
+// Circular arc planes
+CodeXYPlane			"G17"		// arc revolves Z-axis
+CodeXZPlane			"G18"		// arc revolves Y-axis
+CodeYZPlane			"G19"		// arc revolves X-axis
+// Units of measure
+CodeInches			"G20"		// inches mode (Inches/Metric determined by Units above ^^^)
+CodeMetric			"G21"		// metric mode
+// Distance modes
+CodeAbsolute			"G90"		// absolute distance coords
+CodeRelative			"G91"		// relative distance coords
+
+// Spindle
+CodeSpindleCW			"M3"
+CodeSpindleCCW			"M4"
+CodeSpindleOff			"M5"
+// Tool
+CodeToolChange			"M6"
+// Coolant
+CodeCoolantMist			"M7"
+CodeCoolantFlood		"M8"
+CodeCoolantOff			"M9"
+// EOF
+CodeEndProgram			"M30"
+
+
+
+/////////////////////
+// Parameter names //
+/////////////////////
+
+// Labels for parameters
+RegisterX			"X"
+RegisterY			"Y"
+RegisterZ			"Z"
+RegisterI			"I"
+RegisterJ			"J"
+RegisterK			"K"
+RegisterR			"R"
+RegisterSpeed			"S"
+RegisterFeed			"F"
+RegisterTool			"T"
+
+
+
+//////////////////////
+// Block Formatting //
+//////////////////////
+
+
+// Notes:
+
+// These definitions set the structure of individual G-code blocks that PixelCNC will output.
+// They can include actual post-processor variable names as well as internally-generated
+// sub-block variable names, which are in all-caps and start with 'CNC_'
+
+// 'CNC_XXXXXX' sub-block values are automatically generated per their relevant post-processor
+// variables, as specified above, such as whether they can be omitted because of a modal flag
+// if the G-code generator knows that the controller should already have a specified value's
+// sub-block.
+
+// For example: if ModalCoord is nonzero (enabled) then CNC_X/CNC_Y/CNC_Z will only be included in
+// a rapid, linear, or arc move if they have changed since the last motion. Similarly, CNC_GCODE
+// will only emit an actual motion G-code command if the next move is different than the
+// preceeding move, and ModalMotion is nonzero. Otherwise, of ModalMotion is zero, then every
+// motion block will be prefixed with the corresponding G-code command.
+
+// Internally generated 'CNC_XXXXXX' sub-blocks include a delimiter prefix (except CNC_SEQUENCE)
+// to space them apart from the preceeding sub-blocks. This prevents the need to manually include
+// delimiters in these block format definitions, while also preventing several spaces in a row
+// when modal sub-blocks are omitted.
+
+// Extra delimiters on the beginning of a block are automatically culled to prevent a block
+// from beginning with one.
+
+// v1.1: toolchange/spindle/coolant blocks can be entirely omitted by setting the
+// "UseToolChange", "UseSpindle" and "UseCoolant" values to zero.
+
+
+
+// Start of program		( measure units, distance mode )
+PrefixBlock			"[CNC_SEQUENCE][CNC_UNITS][EndOfBlock][CNC_SEQUENCE][CNC_DISTANCE][EndOfBlock]"
+
+// End of program
+PostfixBlock			"[CNC_SEQUENCE][Delimiter][CodeEndProgram][EndOfBlock]"
+
+// Tool Change
+ToolChangeBlock			"[CNC_SEQUENCE][CNC_TOOL][Delimiter][CodeToolChange][EndOfBlock]"
+
+// Spindle
+SpindleCWBlock			"[CNC_SEQUENCE][Delimiter][CodeSpindleCW][CNC_SPEED][EndOfBlock]"
+SpindleCCWBlock			"[CNC_SEQUENCE][Delimiter][CodeSpindleCCW][CNC_SPEED][EndOfBlock]"
+SpindleOffBlock			"[CNC_SEQUENCE][Delimiter][CodeSpindleOff][EndOfBlock]"
+
+// Coolant
+CoolantMistBlock		"[CNC_SEQUENCE][Delimiter][CodeCoolantMist][EndOfBlock]"
+CoolantFloodBlock		"[CNC_SEQUENCE][Delimiter][CodeCoolantFlood][EndOfBlock]"
+CoolantOffBlock			"[CNC_SEQUENCE][Delimiter][CodeCoolantOff][EndOfBlock]"
+
+// Rapid Motion
+RapidBlock			"[CNC_SEQUENCE][CNC_GCODE][CNC_X][CNC_Y][CNC_Z][EndOfBlock]"
+
+// Linear Feed Motion
+LinearBlock			"[CNC_SEQUENCE][CNC_GCODE][CNC_X][CNC_Y][CNC_Z][CNC_FEED][EndOfBlock]"
+
+// Circular Arc Feed Motions
+ArcBlock			"[CNC_SEQUENCE][CNC_PLANE][CNC_GCODE][CNC_X][CNC_Y][CNC_Z][CNC_I][CNC_J][CNC_K][CNC_R][CNC_FEED][EndOfBlock]"
+
+
+
+/////////
+// EOF //
+/////////
